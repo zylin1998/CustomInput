@@ -5,6 +5,8 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.EventSystems;
+using Loyufei.InputSystem;
+using UnityEditor;
 
 namespace Custom.InputSystem.Test
 {
@@ -13,16 +15,21 @@ namespace Custom.InputSystem.Test
         [UnityTest]
         public IEnumerator TouchInputTestPasses()
         {
+            var inputSetting = AssetDatabase.LoadAssetAtPath<InputSetting>("Assets/CustomInput/Test/TestInput/Input List.asset");
+            var inputCenter = new GameObject("InputCenter").AddComponent<InputCenter>();
+
+            inputCenter.SetInput(inputSetting);
+
             var input = new TestTouchInput();
             var joyStick = new VirtualJoyStick();
             var confirm = new TouchButton("Confirm");
             var cancel = new TouchButton("Cancel");
 
-            InputClient.SetRequest(input);
+            inputCenter.SetRequest(input);
 
-            InputClient.SetTouchInput(joyStick);
-            InputClient.SetTouchInput(confirm);
-            InputClient.SetTouchInput(cancel);
+            inputCenter.SetTouchInput(joyStick);
+            inputCenter.SetTouchInput(confirm);
+            inputCenter.SetTouchInput(cancel);
 
             for (int frameCount = 0; frameCount <= 240; frameCount++)
             {
@@ -34,11 +41,11 @@ namespace Custom.InputSystem.Test
         {
             public void GetAxes()
             {
-                Assert.IsNotNull(InputClient.GetAxes<ITouchUnit>("Confirm").First().TouchInput);
-                Assert.IsNotNull(InputClient.GetAxes<ITouchUnit>("Cancel").First().TouchInput);
+                Assert.IsNotNull(InputManager.GetAxes<ITouchUnit>("Confirm").First().TouchInput);
+                Assert.IsNotNull(InputManager.GetAxes<ITouchUnit>("Cancel").First().TouchInput);
 
-                Assert.AreEqual(0f, InputClient.GetAxis("Horizontal"));
-                Assert.AreEqual(0f, InputClient.GetAxis("Vertical"));
+                Assert.AreEqual(0f, InputManager.GetAxis("Horizontal"));
+                Assert.AreEqual(0f, InputManager.GetAxis("Vertical"));
             }
         }
 

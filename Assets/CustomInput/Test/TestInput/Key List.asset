@@ -15,36 +15,74 @@ MonoBehaviour:
   _Name: KeyBoard 01
   _InputMode: 1
   _Platform: 02000000070000000d00000010000000110000002b0000002c0000000000000001000000
+  _ChangeType: 0
   _AxesList:
   - _IsOnSet: 1
     _AxesList:
     - _Name: Horizontal
       _Positive: 275
       _Negative: 276
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
     - _Name: Vertical
       _Positive: 273
       _Negative: 274
-    - _Name: Attack
-      _Positive: 97
-      _Negative: 0
-    - _Name: Jump
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+    - _Name: Confirm
       _Positive: 32
       _Negative: 0
-    _Confirm: 0f0100000d000000
-    _Cancel: 1b000000
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+    - _Name: Cancel
+      _Positive: 9
+      _Negative: 0
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
   - _IsOnSet: 0
     _AxesList:
     - _Name: Horizontal
       _Positive: 275
       _Negative: 276
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
     - _Name: Vertical
       _Positive: 273
       _Negative: 274
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
     - _Name: Attack
       _Positive: 97
       _Negative: 0
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
     - _Name: Jump
       _Positive: 32
       _Negative: 0
-    _Confirm: 0f0100000d000000
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+  _UIControl:
+    _Horizontal:
+      _Name: Horizontal
+      _Positive: 273
+      _Negative: 274
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+    _Vertical:
+      _Name: Vertical
+      _Positive: 275
+      _Negative: 276
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+    _Confirm: 0d000000
     _Cancel: 1b000000

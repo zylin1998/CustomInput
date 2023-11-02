@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Custom.UI;
+using Loyufei.InputSystem;
 
 namespace Custom.InputSystem
 {
@@ -11,6 +12,8 @@ namespace Custom.InputSystem
     {
         [SerializeField]
         private string _AxesName;
+        [SerializeField]
+        private InputCenter _InputCenter;
 
         public string AxesName => this._AxesName;
 
@@ -22,7 +25,7 @@ namespace Custom.InputSystem
 
         private void Start()
         {
-            InputClient.SetTouchInput(this);
+            _InputCenter.SetTouchInput(this);
         }
 
         public string Name => this._AxesName;

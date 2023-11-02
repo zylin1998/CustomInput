@@ -1,3 +1,16 @@
 {
-	"name": "CustomInput"
+    "name": "CustomInput",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9ecfd001ec6f1f44fbee91981f7e2d17"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

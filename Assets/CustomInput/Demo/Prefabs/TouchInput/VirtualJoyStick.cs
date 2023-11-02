@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Loyufei.InputSystem;
 
 namespace Custom.InputSystem
 {
@@ -13,6 +14,8 @@ namespace Custom.InputSystem
         private string _Horizontal = "Horizontal";
         [SerializeField]
         private string _Vertical = "Vertical";
+        [SerializeField]
+        private InputCenter _InputCenter;
 
         private Transform content;
 
@@ -29,7 +32,7 @@ namespace Custom.InputSystem
 
         private void Start()
         {
-            InputClient.SetTouchInput(this);
+            _InputCenter.SetTouchInput(this);
         }
 
         public void OnDrag(PointerEventData eventData)

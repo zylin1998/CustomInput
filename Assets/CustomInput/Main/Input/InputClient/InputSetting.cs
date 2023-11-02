@@ -42,5 +42,31 @@ namespace Custom.InputSystem
         {
             return this.GetSetbyName(name) is TInputSet list ? list : default;
         }
+
+        public Dictionary<string, List<IInputUnit>> Dictionary 
+        {
+            get 
+            {
+                var dic = new Dictionary<string, List<IInputUnit>>();
+
+                foreach(var set in this) 
+                {
+                    set.OnUse.ToList().ForEach(unit => 
+                    {
+                        if (dic.TryGetValue(unit.Name, out var pair)) 
+                        {
+                            pair.Add(unit);
+                        }
+
+                        else 
+                        {
+                            dic.Add(unit.Name, new List<IInputUnit>() { unit });
+                        }
+                    });
+                }
+
+                return dic;
+            }
+        }
     }
 }

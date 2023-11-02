@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Custom.UI;
+using Loyufei.InputSystem;
+using Loyufei;
+using UnityEngine.SocialPlatforms;
 
 namespace Custom.InputSystem
 {
@@ -19,9 +22,16 @@ namespace Custom.InputSystem
         private SelectableMovement Horizontal { get; set; }
         private SelectableMovement Vertical { get; set; }
 
+        public static Stack<IUIManageService> Requests { get; private set; } 
+            = new Stack<IUIManageService>();
+
+        public static IUIManageService Current => Requests.Any() ? Requests.Peek() : null;
+
+        private InputCenter InputCenter => GetComponent<InputCenter>(); 
+
         private void Start()
         {
-            this.UIControls = InputClient.InputSetting.GetSets<KeyInputList>().ConvertAll(c => c.UIControl);
+            this.UIControls = InputCenter.InputSetting.GetSets<KeyInputList>().ConvertAll(c => c.UIControl);
 
             var horiUnits = this.UIControls.ConvertAll(c => c.Horizontal);
             var vertUnits = this.UIControls.ConvertAll(c => c.Vertical);
@@ -35,7 +45,7 @@ namespace Custom.InputSystem
 
         public void GetAxes()
         {
-            if (this.Group.Interactable)
+            if (!Current.IsDefault() && Current.Current.Interactable)
             {
                 this.Move();
 
@@ -57,7 +67,7 @@ namespace Custom.InputSystem
         {
             if (this.UIControls.Any(list => list.IsConfirm))
             {
-                if (this.Group.Last is IClick click)
+                if (Current?.Current.Last is IClick click)
                 {
                     click.OnPointerClick(new PointerEventData(EventSystem.current));
 
@@ -70,7 +80,7 @@ namespace Custom.InputSystem
 
         private void ExpandInput ()
         {
-            if (this.Group.Last is IExpandInput expand)
+            if (Current?.Current.Last is IExpandInput expand)
             {
                 expand.ExpandInput();
             }
@@ -80,21 +90,34 @@ namespace Custom.InputSystem
         {
             if (this.UIControls.Any(list => list.IsCancel))
             {
-                this.Group.Cancel();
+                Current?.Current.Cancel();
             }
         }
 
-        public SelectableGroup Group { get; private set; }
-
-        public void SetSelectableGroup(SelectableGroup group)
+        public void SetRequest(IUIManageService service, bool isCore = false)
         {
-            if (group == null) { return; }
+            if (service.IsDefault()) { return; }
 
-            SelectableMovement.Group = group;
+            Requests.Push(service);
 
-            this.Group = group;
+            Current?.Current.OnSet();
 
-            this.Group.OnSet();
+            InputCenter.SetRequest(this, isCore);
+        }
+
+        public void CleaerRequest(IUIManageService service)
+        {
+            if (service.IsDefault()) { return; }
+
+            if (Current.Equals(service)) 
+            {
+                Requests.Pop();
+                Current?.Current.OnSet();
+            }
+
+            if (!Requests.Any()) { InputCenter.ClearRequest(this); }
+
+            else { Debug.Log("Wrong Request"); }
         }
 
         private class SelectableMovement 
@@ -107,8 +130,6 @@ namespace Custom.InputSystem
 
             public static float HoldMax { get; set; }
             public static float HoldMin { get; set; }
-
-            public static SelectableGroup Group { get; set; }
 
             public SelectableMovement(IEnumerable<IKeyUnit> keyUnits, EAxis axis) 
             {
@@ -130,11 +151,11 @@ namespace Custom.InputSystem
                 {
                     if (this._HoldTime == 0f)
                     {
-                        var s = Group.Select(direct);
+                        var s = Current.Current.Select(direct);
 
-                        if (!s.selected && Group.OnBorder(direct)) 
+                        if (!s.selected && Current.Current.OnBorder(direct)) 
                         {
-                            InputClient.UIManageModule.SetSelectableGroup(Group.State.Transfer(direct));
+                            Current.Transfer(direct);
 
                             this.Reset();
                         }

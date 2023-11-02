@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Custom.InputSystem;
+using Loyufei.InputSystem;
 
 namespace Custom.InputSystem.Test
 {
@@ -14,14 +14,12 @@ namespace Custom.InputSystem.Test
         public void InputClientTestPasses()
         {
             var input = AssetDatabase.LoadAssetAtPath<InputSetting>("Assets/CustomInput/Test/TestInput/Input List.asset");
+            var inputCenter = new GameObject("InputCenter").AddComponent<InputCenter>();
+            
+            inputCenter.SetInput(input);
 
-            InputClient.SetInput(input);
-
-            Assert.IsNotNull(InputClient.Client);
-            Assert.IsNotNull(InputClient.InputSetting);
-            Assert.IsNotNull(InputClient.InputSets);
-            Assert.AreEqual(false, InputClient.Client.Pause);
-            Assert.AreEqual(RuntimePlatform.OSXEditor, InputClient.Platform);
+            Assert.IsNotNull(inputCenter);
+            Assert.IsNotNull(inputCenter.InputSetting);
         }
     }
 }

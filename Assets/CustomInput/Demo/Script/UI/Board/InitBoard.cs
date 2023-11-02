@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Custom.UI;
 using Custom.InputSystem;
+using Loyufei.InputSystem;
+using Loyufei;
 
 namespace InputDemo
 {
-    public class InitBoard : MonoBehaviour
+    public class InitBoard : MonoBehaviour, IUIManageService
     {
         [SerializeField]
         private SelectableGroup _Input;
@@ -15,11 +17,23 @@ namespace InputDemo
         private SelectableGroup _Start;
         [SerializeField]
         private CanvasGroup _CanvasGroup;
+        [SerializeField]
+        private InputCenter _InputCenter;
 
         public static IClick StartButton { get; private set; }
 
         public KeyInputList KeyInputList { get; private set; }
         public List<InputSlot> InputSlots { get; private set;}
+
+        public SelectableGroup Current { get; set; }
+
+        public void Transfer(Vector2 direct)
+        { 
+            var transfer = Current.State.Transfer(direct);
+
+            Current = transfer.IsDefaultandReturn(Current);
+            Current.Last.Select();
+        }
 
         private void Awake()
         {
@@ -41,7 +55,7 @@ namespace InputDemo
             this._Input.SetNavigation();
             this._Start.SetNavigation();
 
-            this.KeyInputList = InputClient.InputSetting.GetSetbyName<KeyInputList>("Keyboard");
+            this.KeyInputList = _InputCenter.InputSetting.GetSetbyName<KeyInputList>("Keyboard");
 
             this.InputSlots = this._Input.OfType<InputSlot>().ToList();
 
@@ -49,21 +63,23 @@ namespace InputDemo
 
             ReStartBoard.ReStartButton.ClickEvent += (data) => this.ReStarted();
 
-            InputClient.SetRequest(this._Input.gameObject.activeSelf ? this._Input : this._Start);
+            this.Current = _Input.gameObject.activeSelf ? _Input : _Start;
+
+            _InputCenter.SetRequest(this);
         }
 
         private void Started() 
         {
             this.gameObject.SetActive(false);
 
-            InputClient.ClearCurrentRequest();
+            _InputCenter.ClearRequest(this);
         }
 
         private void ReStarted() 
         {
             this.gameObject.SetActive(true);
 
-            InputClient.SetRequest(this._Input);
+            _InputCenter.SetRequest(this);
 
             this._Input.Select(this._Input.First);
         }
@@ -76,39 +92,25 @@ namespace InputDemo
 
             slot.ClickEvent += (data) =>
             {
-                this.ChangeKey(slot);
+                _InputCenter.GetKeyCode(keyCode =>
+                {
+                    var same = this.KeyInputList.ChangeKey(slot.AxesName, slot.Positive, keyCode);
+
+                    this.InputSlots
+                        .FindAll(f => f.AxesName == same?.Name)
+                        .ForEach(f => f.UpdateSlot());
+                });
             };
         }
 
         private void CheckInputMode() 
         {
-            if (!InputClient.InputMode.HasFlag(InputClient.EInputMode.KeyMode))
+            if (!_InputCenter.CheckInputMode(EInputMode.KeyMode))
             {
-                var transfors = this._Start.State.Transfers;
-
-                transfors.Remove(transfors.Find(f => f.Group == this._Input));
+                this._Start.State.Transfers.Clear();
 
                 this._Input.Content.gameObject.SetActive(false);
             }
-        }
-
-        private async void ChangeKey(InputSlot slot) 
-        {
-            this._Input.Interactable = false;
-
-            var keyCode = await InputClient.GetKeyCode();
-            
-            var same = this.KeyInputList.ChangeKey(slot.AxesName, slot.Positive, keyCode);
-            
-            this.InputSlots
-                .FindAll(f => f.AxesName == same?.Name)
-                .ForEach(f => f.UpdateSlot());
-
-            slot.UpdateSlot();
-
-            await System.Threading.Tasks.Task.Delay(250);
-
-            this._Input.Interactable = true;
         }
 
         private void OnDestroy()

@@ -4,16 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Custom.InputSystem;
+using Loyufei.InputSystem;
 
 namespace InputDemo
 {
     public class InputDemo : MonoBehaviour, IInputRequest
     {
-        [Header("Demo Platform")]
+        [Header("Input Center")]
         [SerializeField]
-        private bool _PlatformTest;
-        [SerializeField]
-        private RuntimePlatform _Platform = RuntimePlatform.WindowsEditor;
+        private InputCenter _InputCenter;
         [Header("Character Control")]
         [SerializeField]
         private InputSetting _InputSetting;
@@ -67,12 +66,7 @@ namespace InputDemo
 
         private void Awake()
         {
-            InputClient.SetInput(_InputSetting);
-
-            if (this._PlatformTest)
-            {
-                InputClient.SetPlatform(this._Platform); 
-            }
+            _InputCenter.SetInput(_InputSetting);
 
             OnScoreChanged += (s) =>
             { 
@@ -87,7 +81,7 @@ namespace InputDemo
 
         private void Start()
         {
-            InputClient.SetRequest(this, true);
+            _InputCenter.SetRequest(this, true);
 
             InitBoard.StartButton.ClickEvent += (data) =>
             {
@@ -105,12 +99,12 @@ namespace InputDemo
 
         public void GetAxes() 
         {
-            var x = InputClient.GetAxis("Horizontal");
-            var y = InputClient.GetAxis("Vertical");
-
+            var x = InputManager.GetAxis("Horizontal");
+            var y = InputManager.GetAxis("Vertical");
+            Debug.Log(new Vector2(x, y));
             this._Character.Move(new Vector2(x, y));
 
-            if (InputClient.GetKeyDown("Interact") && this._Character.Interacts.Any()) 
+            if (InputManager.GetKeyDown("Interact") && this._Character.Interacts.Any()) 
             {
                 this._Character.Interact(this._Character.Interacts.First());
             }

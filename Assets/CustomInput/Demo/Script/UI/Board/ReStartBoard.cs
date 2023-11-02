@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Custom.UI;
 using Custom.InputSystem;
+using Loyufei.InputSystem;
 
 namespace InputDemo
 {
-    public class ReStartBoard : MonoBehaviour
+    public class ReStartBoard : MonoBehaviour, IUIManageService
     {
         [SerializeField]
         private SelectableGroup _ReStart;
+        [SerializeField]
+        private InputCenter _InputCenter;
         
         public static IClick ReStartButton { get; private set; }
+
+        public SelectableGroup Current => this._ReStart;
 
         private void Awake()
         {
@@ -29,7 +34,7 @@ namespace InputDemo
             {
                 this.gameObject.SetActive(true);
 
-                InputClient.SetRequest(this._ReStart);
+                _InputCenter.SetRequest(this);
                 
                 this._ReStart.Select(this._ReStart.First);
             };
@@ -41,6 +46,8 @@ namespace InputDemo
 
             this.gameObject.SetActive(false);
         }
+
+        public void Transfer(Vector2 direct) { Debug.Log("One Group Only."); }
 
         private void OnDestroy()
         {

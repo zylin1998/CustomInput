@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Custom.InputSystem;
+using Loyufei.InputSystem;
 
 namespace InputDemo
 {
@@ -13,14 +14,16 @@ namespace InputDemo
         private Transform _Content;
         [SerializeField]
         private List<InputText> _Texts;
+        [SerializeField]
+        private InputCenter _InputCenter;
 
         public IInputSubset InputSubset { get; private set; }
 
         private void Start()
         {
-            if (!InputClient.InputMode.HasFlag(InputClient.EInputMode.KeyMode)) { Destroy(this.gameObject); }
+            if (!_InputCenter.CheckInputMode(EInputMode.KeyMode)) { Destroy(this.gameObject); }
 
-            this.InputSubset = InputClient.InputSetting.GetSetbyName("Keyboard").OnUse;
+            this.InputSubset = _InputCenter.InputSetting.GetSetbyName("Keyboard").OnUse;
 
             this._Texts = this._Content.GetComponentsInChildren<InputText>().ToList();
 

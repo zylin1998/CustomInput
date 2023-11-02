@@ -10,24 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1debc4e86f5988a4486817c4d3fe1139, type: 3}
-  m_Name: Mobile List
+  m_Name: Touch List
   m_EditorClassIdentifier: 
-  _Name: Mobile
-  _InputMode: 2
-  _Platform: 080000000b0000000000000001000000
+  _Name: 
+  _InputMode: 0
+  _Platform: 0000000007000000
   _AxesList:
   - _IsOnSet: 1
     _JoySticks:
     - _Name: Horizontal
       _AxisType: 0
       _Degree: 60
+      _WholeNumber: 0
+      _Convergence: 0
+      _Sensitive: 0
     - _Name: Vertical
       _AxisType: 1
       _Degree: 60
+      _WholeNumber: 0
+      _Convergence: 0
+      _Sensitive: 0
     _Buttons:
-    - _Name: Skill 1
-    - _Name: Skill 2
-    - _Name: Skill 3
-    - _Name: Flash
-    - _Name: Attack
-    - _Name: Jump
+    - _Name: Confirm
+    - _Name: Cancel

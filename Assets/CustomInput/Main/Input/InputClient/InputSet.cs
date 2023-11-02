@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Loyufei.InputSystem;
 
 namespace Custom.InputSystem
 {
@@ -10,13 +11,14 @@ namespace Custom.InputSystem
         [SerializeField]
         private string _Name;
         [SerializeField]
-        private InputClient.EInputMode _InputMode;
+        private EInputMode _InputMode;
         [SerializeField]
         private List<RuntimePlatform> _Platform;
 
         public string Name => this._Name;
-        public InputClient.EInputMode InputMode => this._InputMode;
+        public EInputMode InputMode => this._InputMode;
         public List<RuntimePlatform> Platform => this._Platform;
+        public Dictionary<string, IInputUnit> Dictionary => this.OnUse.ToDictionary(x => x.Name, y => y);
 
         protected Subset _OnUse;
 
@@ -84,10 +86,11 @@ namespace Custom.InputSystem
     public interface IInputSet : IEnumerable<IInputSubset>
     {
         public string Name { get; }
-        public InputClient.EInputMode InputMode { get; }
+        public EInputMode InputMode { get; }
         public List<RuntimePlatform> Platform { get; }
         public IInputSubset OnUse { get; }
-        public bool CheckPlatform => this.Platform.Contains(InputClient.Platform);
+        public bool CheckPlatform => this.Platform.Contains(Application.platform);
+        public Dictionary<string, IInputUnit> Dictionary { get; }
 
         public IInputSubset SetOnUse(int index);
     }
