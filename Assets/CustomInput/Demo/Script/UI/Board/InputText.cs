@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Custom.InputSystem;
-using Custom.UI;
+using Loyufei.UI;
+using Loyufei.InputSystem;
 
 namespace InputDemo
 {

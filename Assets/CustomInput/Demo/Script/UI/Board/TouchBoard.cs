@@ -7,14 +7,15 @@ namespace Custom.InputSystem
 {
     public class TouchBoard : MonoBehaviour
     {
-        [SerializeField]
-        private InputCenter _InputCenter;
+        public InputCenter InputCenter { get; private set; }
 
         void Start()
         {
-            if (!_InputCenter.CheckInputMode(EInputMode.TouchMode))
+            InputCenter = InputSystemProperty.InputCenter;
+
+            if (!InputCenter.CheckInputMode(EInputMode.Touch))
             {
-                Destroy(this.gameObject);
+                Destroy(gameObject);
             }
         }
     }

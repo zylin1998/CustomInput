@@ -3,26 +3,12 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Custom.InputSystem;
 using Loyufei.InputSystem;
 
 namespace InputDemo
 {
     public class InputDemo : MonoBehaviour, IInputRequest
     {
-        [Header("Input Center")]
-        [SerializeField]
-        private InputCenter _InputCenter;
-        [Header("Character Control")]
-        [SerializeField]
-        private InputSetting _InputSetting;
-        [SerializeField]
-        private Character _Character;
-        [Header("Item  Creation")]
-        [SerializeField]
-        private ItemCreator _ItemCreator;
-        [SerializeField]
-        private float _CreateTime = 5f;
         [Header("Game State")]
         [SerializeField]
         private bool _End;
@@ -36,26 +22,26 @@ namespace InputDemo
         public static Action<int> OnScoreChanged { get; set; }
         public static Action<bool> OnEndChanged { get; set; }
 
-        public bool End 
+        public bool End
         {
-            get => this._End;
+            get => _End;
 
-            set 
+            set
             {
-                this._End = value;
+                _End = value;
 
-                if (this._End) { OnEndChanged?.Invoke(this._End); }
+                if (End) { OnEndChanged?.Invoke(End); }
             }
         }
 
-        public static int Score 
-        { 
+        public static int Score
+        {
             get => _Score;
-            
+
             set
             {
                 _Score = value;
-                
+
                 OnScoreChanged?.Invoke(_Score);
             }
         }
@@ -66,74 +52,40 @@ namespace InputDemo
 
         private void Awake()
         {
-            _InputCenter.SetInput(_InputSetting);
-
             OnScoreChanged += (s) =>
             { 
-                this._CurrentScore = s;
+                _CurrentScore = s;
 
-                this.End = this._CurrentScore == this._MaxScore;
+                End = _CurrentScore == _MaxScore;
             };
 
-            MaxScore = this._MaxScore;
-            Score = this._CurrentScore;
+            MaxScore = _MaxScore;
+            Score = _CurrentScore;
         }
 
         private void Start()
         {
-            _InputCenter.SetRequest(this, true);
+            InputSystemProperty.InputCenter.SetRequest(this, true);
 
-            InitBoard.StartButton.ClickEvent += (data) =>
+            InitBoard.StartButton.onClick.AddListener(() =>
             {
-                this._CurrentScore = 0;
-                this._BallCount = 0;
-                this._PassTime = this._CreateTime;
+                _CurrentScore = 0;
+                _BallCount = 0;
+                _PassTime = _CreateTime;
 
-                Score = this._CurrentScore;
+                Score = _CurrentScore;
 
-                StartCoroutine(this.CreateItem());
-            };
-        }
+                StartCoroutine(CreateItem());
 
-        #endregion
+                _Character.Controller.enabled = true;
+            });
 
-        public void GetAxes() 
-        {
-            var x = InputManager.GetAxis("Horizontal");
-            var y = InputManager.GetAxis("Vertical");
-            Debug.Log(new Vector2(x, y));
-            this._Character.Move(new Vector2(x, y));
-
-            if (InputManager.GetKeyDown("Interact") && this._Character.Interacts.Any()) 
+            ReStartBoard.ReStartButton.onClick.AddListener(() =>
             {
-                this._Character.Interact(this._Character.Interacts.First());
-            }
-        }
+                _Character.Controller.enabled = false;
 
-        private int _BallCount;
-        private float _PassTime;
-
-        private IEnumerator CreateItem() 
-        {
-            while(true) 
-            {
-                if (this._End) { yield break; }
-
-                if (this._BallCount == this._MaxScore) { yield break; }
-
-                this._PassTime += Time.deltaTime;
-
-                if (this._PassTime >= this._CreateTime) 
-                {
-                    this._ItemCreator.RandomCreate();
-                    
-                    this._PassTime = 0f;
-
-                    this._BallCount++;
-                }
-
-                yield return null;
-            }
+                _Character.MoveTo(Vector3.zero, Quaternion.identity);
+            });
         }
 
         private void OnDestroy()
@@ -144,5 +96,63 @@ namespace InputDemo
             Score = 0;
             MaxScore = 0;
         }
+
+        #endregion
+
+        #region Character Control
+
+        [Header("Character Control")]
+        [SerializeField]
+        private Character _Character;
+
+        public void GetAxes() 
+        {
+            var x = InputManager.GetAxis("Horizontal");
+            var y = InputManager.GetAxis("Vertical");
+            
+            _Character.Move(new Vector2(x, y));
+
+            if (InputManager.GetKeyDown("Interact") && _Character.Interacts.Any()) 
+            {
+                _Character.Interact(_Character.Interacts.First());
+            }
+        }
+
+        public void Setup() { }
+
+        public void UnSet() { }
+
+        #endregion
+
+        #region Create Items
+
+        [Header("Item  Creation")]
+        [SerializeField]
+        private ItemCreator _ItemCreator;
+        [SerializeField]
+        private float _CreateTime = 5f;
+        
+        private int _BallCount;
+        private float _PassTime;
+
+        private IEnumerator CreateItem() 
+        {
+            for(; !_End && _BallCount < _MaxScore; _PassTime += Time.deltaTime) 
+            {
+                if (_PassTime >= _CreateTime)
+                {
+                    _ItemCreator.RandomCreate();
+
+                    _PassTime = 0f;
+
+                    _BallCount++;
+
+                }
+
+                yield return null;
+            }
+        }
+
+        #endregion
     }
 }

@@ -13,13 +13,13 @@ namespace Custom.InputSystem.Test
         [Test]
         public void InputClientTestPasses()
         {
-            var input = AssetDatabase.LoadAssetAtPath<InputSetting>("Assets/CustomInput/Test/TestInput/Input List.asset");
+            var input = AssetDatabase.LoadAssetAtPath<InputCollection>("Assets/CustomInput/Test/TestInput/Input List.asset");
             var inputCenter = new GameObject("InputCenter").AddComponent<InputCenter>();
             
             inputCenter.SetInput(input);
 
             Assert.IsNotNull(inputCenter);
-            Assert.IsNotNull(inputCenter.InputSetting);
+            Assert.IsNotNull(inputCenter.InputCollection);
         }
     }
 }

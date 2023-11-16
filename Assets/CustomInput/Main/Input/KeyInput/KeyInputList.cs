@@ -3,104 +3,85 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Custom.InputSystem
+namespace Loyufei.InputSystem
 {
-    [CreateAssetMenu(fileName = "Key List", menuName = "Custum Input/Key List", order = 1)]
+    [CreateAssetMenu(fileName = "Key Input", menuName = "Input System/Input List/Key Input", order = 1)]
     public class KeyInputList : InputSet
     {
         [SerializeField]
         private EChangeKey _ChangeType = EChangeKey.Exchange;
         [SerializeField]
-        private List<Subset> _AxesList;
+        private List<Subset> _UnitSubsets;
         [SerializeField]
-        private UIControlInput _UIControl;
+        private bool _IndependentUIControl;
+        [SerializeField]
+        private Subset _UIControl;
 
-        public UIControlInput UIControl => this._UIControl;
+        public IInputUnit UIControlUnit(string axisName)
+            => _IndependentUIControl ? _UIControl[axisName] : OnUse[axisName];
 
-        public IKeyUnit ChangeKey(string axisName, IKeyUnit.EPositive positive, KeyCode keyCode) 
+        public (IKeyUnit change, IKeyUnit exchange) ChangeKey(string axisName, IKeyUnit.EPositive positive, KeyCode keyCode) 
         {
-            if (this.OnUse is Subset subset) 
+            if (OnUse is Subset subset) 
             {
-                if (this._UIControl.DisableKeyCodes.Exists(e => e == keyCode)) { return null; }
-
-                var target = subset[axisName];
-                var same = subset[keyCode];
+                var change = subset[axisName];
+                var exchange = subset[keyCode];
                 
-                if (same != null) 
+                if (!exchange.IsDefault()) 
                 {
-                    var samePositive = same.Positive == keyCode ? IKeyUnit.EPositive.Positive : IKeyUnit.EPositive.Negative;
-                    var sameKeyCode = this._ChangeType == EChangeKey.Delete ? KeyCode.None : target[positive];
+                    var exchangePositive = exchange.Positive == keyCode ? IKeyUnit.EPositive.Positive : IKeyUnit.EPositive.Negative;
+                    var exchangeKeyCode = _ChangeType == EChangeKey.Delete ? KeyCode.None : change[positive];
 
-                    same.SetAxes(samePositive, sameKeyCode);
+                    exchange.SetAxes(exchangePositive, exchangeKeyCode);
                 }
 
-                target.SetAxes(positive, keyCode);
+                change.SetAxes(positive, keyCode);
                 
-                return same;
+                return (change, exchange);
             }
 
-            return null;
+            return (default, default);
         }
 
-        public override IEnumerator<IInputSubset> GetEnumerator() => this._AxesList.GetEnumerator();
+        public override IEnumerator<IInputSubset> GetEnumerator() => this._UnitSubsets.GetEnumerator();
+
+        private void Reset()
+        {
+            var defaultUnit = InputSystemProperty.DefaultUnits;
+
+            InputMode = EInputMode.Keyboard;
+            _ChangeType = EChangeKey.Exchange;
+            _UnitSubsets = new List<Subset>() { new Subset() };
+            _IndependentUIControl = true;
+            _UIControl = new Subset(defaultUnit?.GetUIControlUnits());
+        }
 
         [System.Serializable]
         private new class Subset : InputSet.Subset
         {
-            [SerializeField]
-            private List<KeyInput> _AxesList;
+            public Subset() 
+            {
+                var defaultUnits = InputSystemProperty.DefaultUnits;
 
-            public new IKeyUnit this[string name] => this._AxesList.Find(f => f.Name == name);
+                _Units = defaultUnits ? defaultUnits.GetUnits<KeyUnit>() : new List<KeyUnit>();
+            }
+
+            public Subset(IEnumerable<KeyUnit> units) 
+            {
+                _Units = !units.IsDefault() ? units.ToList() : new List<KeyUnit>();
+            }
+
+            [SerializeField]
+            private List<KeyUnit> _Units;
+
+            public new IKeyUnit this[string name] => _Units.Find(f => f.Name == name);
             
             public IKeyUnit this[KeyCode keyCode]
             {
-                get => this._AxesList.Find(f => f.Positive == keyCode || f.Negative == keyCode);
+                get => _Units.Find(f => f.Positive == keyCode || f.Negative == keyCode);
             }
 
-            public override IEnumerator<IInputUnit> GetEnumerator() => this._AxesList.GetEnumerator();
-        }
-
-        [System.Serializable]
-        public class UIControlInput : IInputSubset
-        {
-            [SerializeField]
-            private KeyInput _Horizontal;
-            [SerializeField]
-            private KeyInput _Vertical;
-            [SerializeField]
-            private List<KeyCode> _Confirm;
-            [SerializeField]
-            private List<KeyCode> _Cancel;
-
-            public KeyInput Horizontal => this._Horizontal;
-            public KeyInput Vertical => this._Vertical;
-
-            public bool IsConfirm => this._Confirm.Any(k => Input.GetKeyDown(k));
-            public bool IsCancel => this._Cancel.Any(k => Input.GetKeyDown(k));
-
-            public List<KeyCode> DisableKeyCodes => this._Confirm.Concat(this._Cancel).ToList();
-
-            public IInputUnit this[string name] => this.ToList().Find(f => f.Name == name);
-
-            private List<KeyInput> _Axes;
-
-            public bool IsOnSet => true;
-
-            public IEnumerator<IInputUnit> GetEnumerator()
-            {
-                if (this._Axes == null) 
-                {
-                    this._Axes = new List<KeyInput>(2)
-                    {
-                        this._Horizontal,
-                        this._Vertical
-                    };
-                }
-
-                return this._Axes.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+            public override IEnumerator<IInputUnit> GetEnumerator() => _Units.GetEnumerator();
         }
 
         [System.Serializable]

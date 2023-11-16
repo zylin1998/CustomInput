@@ -14,12 +14,16 @@ namespace Custom.InputSystem.Test
         {
             public void GetAxes()
             {
-                Assert.AreEqual(KeyCode.Space, InputManager.GetAxes<KeyInput>("Confirm").First().Positive);
-                Assert.AreEqual(KeyCode.Escape, InputManager.GetAxes<KeyInput>("Cancel").First().Positive);
+                Assert.AreEqual(KeyCode.Space, InputManager.GetAxes<KeyUnit>("Confirm").First().Positive);
+                Assert.AreEqual(KeyCode.Escape, InputManager.GetAxes<KeyUnit>("Cancel").First().Positive);
 
                 Assert.AreEqual(0f, InputManager.GetAxis("Horizontal"));
                 Assert.AreEqual(0f, InputManager.GetAxis("Vertical"));
             }
+
+            public void Setup() { }
+
+            public void UnSet() { }
         }
 
         [UnityTest]

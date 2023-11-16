@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Custom.UI
+namespace Loyufei.UI
 {
     public interface ISlot 
     {

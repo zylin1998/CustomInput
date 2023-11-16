@@ -9,9 +9,8 @@ namespace InputDemo
     {
         private void Awake()
         {
-            this._Controller = this.GetComponent<CharacterController>();
-            this._MainCamera = Camera.main.transform;
-            this.Interacts = new List<IInteract>();
+            _Controller = GetComponent<CharacterController>();
+            _MainCamera = Camera.main.transform;
         }
 
         #region Movement
@@ -36,26 +35,13 @@ namespace InputDemo
         
         private Transform _MainCamera;
 
-        private bool _CanMove = true;
-
-        private void Start()
-        {
-            ReStartBoard.ReStartButton.ClickEvent += (data) =>
-            {
-                this.MoveTo(Vector3.zero, Quaternion.identity);
-            };
-
-            InputDemo.OnEndChanged += (end) =>
-            {
-                this._CanMove = false;
-            };
-        }
+        public CharacterController Controller => _Controller;
 
         public void Move(Vector2 direct)
         {
-            if (!_CanMove) { return; }
+            if (!_Controller.enabled) { return; }
 
-            this.GroundCheck();
+            GroundCheck();
 
             if (direct == Vector2.zero) { return; }
 
@@ -69,64 +55,64 @@ namespace InputDemo
                 var atan2 = Mathf.Atan2(direction.x, direction.z);
                 var targetAngle = atan2 * Mathf.Rad2Deg + this._MainCamera.eulerAngles.y;
 
-                var angleY = this.transform.eulerAngles.y;
+                var angleY = transform.eulerAngles.y;
                 var angle = Mathf.SmoothDampAngle(angleY, targetAngle, ref _TurnSmoothVelocity, _TurnSmoothTime);
                 
-                this.transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
                 var moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
                 
-                this._Controller.Move(moveDir.normalized * _Speed * Time.deltaTime);
+                _Controller.Move(moveDir.normalized * _Speed * Time.deltaTime);
             }
         }
 
         private void GroundCheck()
         {
-            this._IsGround = Physics.CheckSphere(this.transform.position, this._GroundDistance, this._GroundMask);
+            _IsGround = Physics.CheckSphere(transform.position, _GroundDistance, _GroundMask);
 
-            if (this._IsGround && this._Velocity.y < 0)
+            if (_IsGround && _Velocity.y < 0)
             {
-                this._Velocity.y = -2f;
+                _Velocity.y = -2f;
             }
 
-            this._Velocity.y += this._Gravity * Time.deltaTime;
+            _Velocity.y += _Gravity * Time.deltaTime;
 
-            this._Controller.Move(this._Velocity * Time.deltaTime);
+            _Controller.Move(_Velocity * Time.deltaTime);
         }
 
         public void MoveTo(Vector3 position, Quaternion rotation) 
         {
-            this._Controller.Move(Vector3.zero);
-
-            this.transform.SetPositionAndRotation(position, rotation);
-
-            this._CanMove = true;
+            transform.SetPositionAndRotation(position, rotation);
         }
 
         #endregion
 
+        #region IContact
+
         [SerializeField]
         private Transform _Hint;
 
-        public List<IInteract> Interacts { get; private set; }
+        public List<IInteract> Interacts { get; private set; } = new List<IInteract>();
         
         public void Contact(IInteract interact) 
         {
-            this.Interacts.Add(interact);
+            Interacts.Add(interact);
 
-            if (this.Interacts.Any()) { this._Hint?.gameObject.SetActive(true); }
+            if (Interacts.Any()) { _Hint?.gameObject.SetActive(true); }
         }
 
         public void DisContact(IInteract interact) 
         {
-            this.Interacts.Remove(interact);
+            Interacts.Remove(interact);
 
-            if (!this.Interacts.Any()) { this._Hint?.gameObject.SetActive(false); }
+            if (!Interacts.Any()) { _Hint?.gameObject.SetActive(false); }
         }
 
         public void Interact(IInteract interact) 
         {
             interact?.Interact(this);
         }
+
+        #endregion
     }
 }

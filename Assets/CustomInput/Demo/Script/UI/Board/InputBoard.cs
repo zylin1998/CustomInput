@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Custom.InputSystem;
 using Loyufei.InputSystem;
 
 namespace InputDemo
@@ -14,20 +13,22 @@ namespace InputDemo
         private Transform _Content;
         [SerializeField]
         private List<InputText> _Texts;
-        [SerializeField]
-        private InputCenter _InputCenter;
+        
+        public InputCenter InputCenter { get; private set; }
 
         public IInputSubset InputSubset { get; private set; }
 
         private void Start()
         {
-            if (!_InputCenter.CheckInputMode(EInputMode.KeyMode)) { Destroy(this.gameObject); }
+            InputCenter = InputSystemProperty.InputCenter;
 
-            this.InputSubset = _InputCenter.InputSetting.GetSetbyName("Keyboard").OnUse;
+            if (!InputCenter.CheckInputMode(EInputMode.Keyboard)) { Destroy(gameObject); }
 
-            this._Texts = this._Content.GetComponentsInChildren<InputText>().ToList();
+            InputSubset = InputCenter.InputCollection.GetSet<KeyInputList>().OnUse;
 
-            InitBoard.StartButton.ClickEvent += (data) => this.SetSlots();
+            _Texts = _Content.GetComponentsInChildren<InputText>().ToList();
+
+            InitBoard.StartButton.onClick.AddListener(() => this.SetSlots());
         }
 
         public void SetSlots() 

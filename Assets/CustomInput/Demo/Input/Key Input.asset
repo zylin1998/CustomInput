@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f48107ee251224891fc21f05edafd0, type: 3}
+  m_Name: Key Input
+  m_EditorClassIdentifier: 
+  _InputMode: 2
+  _ChangeType: 0
+  _UnitSubsets:
+  - _IsOnSet: 0
+    _Units:
+    - _Name: Horizontal
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 100
+      _Negative: 97
+    - _Name: Vertical
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 119
+      _Negative: 115
+    - _Name: Interact
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 101
+      _Negative: 0
+  _IndependentUIControl: 1
+  _UIControl:
+    _IsOnSet: 0
+    _Units:
+    - _Name: Horizontal
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 275
+      _Negative: 276
+    - _Name: Vertical
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 273
+      _Negative: 274
+    - _Name: Submit
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 13
+      _Negative: 0
+    - _Name: Cancel
+      _WholeNumber: 0
+      _Convergence: 1
+      _Sensitive: 0.5
+      _Positive: 27
+      _Negative: 0

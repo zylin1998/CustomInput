@@ -1,53 +1,63 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Custom.UI;
-using Custom.InputSystem;
+using UnityEngine.UI;
 using Loyufei.InputSystem;
+using UnityEngine.EventSystems;
 
 namespace InputDemo
 {
-    public class ReStartBoard : MonoBehaviour, IUIManageService
+    public class ReStartBoard : MonoBehaviour, IInputRequest
     {
         [SerializeField]
-        private SelectableGroup _ReStart;
-        [SerializeField]
-        private InputCenter _InputCenter;
+        private Button _RestartButton;
         
-        public static IClick ReStartButton { get; private set; }
-
-        public SelectableGroup Current => this._ReStart;
+        public static Button ReStartButton { get; private set; }
 
         private void Awake()
         {
-            this._ReStart.GetSelectables();
+            ReStartButton = _RestartButton;
 
-            if (this._ReStart["ReStart"] is IClick reStart) 
-            {
-                ReStartButton = reStart;
-            }
+            ReStartButton.onClick.AddListener(() => { InputSystemProperty.InputCenter.ClearRequest(this); });
         }
 
         private void Start()
         {
-            InputDemo.OnEndChanged += (end) =>
-            {
-                this.gameObject.SetActive(true);
+            InputDemo.OnEndChanged += (end) => { InputSystemProperty.InputCenter.SetRequest(this); };
 
-                _InputCenter.SetRequest(this);
-                
-                this._ReStart.Select(this._ReStart.First);
-            };
-
-            ReStartButton.ClickEvent += (data) =>
-            {
-                this.gameObject.SetActive(false);
-            };
-
-            this.gameObject.SetActive(false);
+            UnSet();
         }
 
-        public void Transfer(Vector2 direct) { Debug.Log("One Group Only."); }
+        public void GetAxes() 
+        {
+            var input = FindObjectOfType<BaseInputModule>().inputOverride;
+            
+            if (input && input.GetButtonDown("Cancel")) 
+            {
+                Escape();
+            }
+        }
+
+        public void Setup()
+        {
+            gameObject.SetActive(true);
+
+            if (InputSystemProperty.InputCenter.CheckInputMode(EInputMode.Keyboard)) 
+            {
+                _RestartButton.Select(); 
+            }
+        }
+
+        public void UnSet() 
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Escape() 
+        {
+            ReStartButton.onClick.Invoke();
+        }
 
         private void OnDestroy()
         {

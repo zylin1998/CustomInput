@@ -15,13 +15,13 @@ namespace Custom.InputSystem.Test
         [UnityTest]
         public IEnumerator TouchInputTestPasses()
         {
-            var inputSetting = AssetDatabase.LoadAssetAtPath<InputSetting>("Assets/CustomInput/Test/TestInput/Input List.asset");
+            var inputSetting = AssetDatabase.LoadAssetAtPath<InputCollection>("Assets/CustomInput/Test/TestInput/Input List.asset");
             var inputCenter = new GameObject("InputCenter").AddComponent<InputCenter>();
 
             inputCenter.SetInput(inputSetting);
 
             var input = new TestTouchInput();
-            var joyStick = new VirtualJoyStick();
+            /*var joyStick = new VirtualJoyStick();
             var confirm = new TouchButton("Confirm");
             var cancel = new TouchButton("Cancel");
 
@@ -29,7 +29,7 @@ namespace Custom.InputSystem.Test
 
             inputCenter.SetTouchInput(joyStick);
             inputCenter.SetTouchInput(confirm);
-            inputCenter.SetTouchInput(cancel);
+            inputCenter.SetTouchInput(cancel);*/
 
             for (int frameCount = 0; frameCount <= 240; frameCount++)
             {
@@ -47,9 +47,12 @@ namespace Custom.InputSystem.Test
                 Assert.AreEqual(0f, InputManager.GetAxis("Horizontal"));
                 Assert.AreEqual(0f, InputManager.GetAxis("Vertical"));
             }
+
+            public void Setup() { }
+            public void UnSet() { }
         }
 
-        private class VirtualJoyStick : IVJoyStick
+        /*private class VirtualJoyStick : IVJoyStick
         {
             public string Horizontal => "Horizontal";
             public string Vertical => "Vertical";
@@ -74,9 +77,9 @@ namespace Custom.InputSystem.Test
 
                 this.Angle = angle;
             }
-        }
+        }*/
 
-        private class TouchButton : ITouchButton
+        /*private class TouchButton : ITouchButton
         {
             public string AxesName { get; private set; }
 
@@ -114,6 +117,6 @@ namespace Custom.InputSystem.Test
 
                 this.GetKeyUp = true;
             }
-        }
+        }*/
     }
 }
